@@ -1,0 +1,4 @@
+cgi-bin/*_log.txt
+cgi-bin/__pycache__/
+LOG/*
+myenv/

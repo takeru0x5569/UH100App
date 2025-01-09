@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>UH-100P : Home</title>
+    <script src="/static/scripts.js"></script> <!-- 外部スクリプトを参照 -->
+    <script src="/static/plotly-latest.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // 初期グラフ設定
+            var traceData = [];
+            for (var i = 0; i < 18; i++) {
+                traceData.push({
+                    x: [],
+                    y: [],
+                    mode: 'lines',  // ドットを削除
+                    name: `CH${i}`
+                });
+            }
+            //グラフのレイアウト設定
+            var layout = {
+                title: 'モニタデータ',
+                xaxis: {
+                    title: 'カウント',
+                    gridcolor: '#C0C0C0'
+                },
+                yaxis: { title: '値',
+                    autorange: true,
+                    gridcolor: '#C0C0C0'
+                },
+            };
+
+            Plotly.newPlot('graph', traceData, layout);
+            //----------------------------------------------
+            // WebSocket接続:ラズパイのIPアドレスを指定
+            //----------------------------------------------
+            const socket = new WebSocket('ws://192.168.10.227:3000');
+            //----------------------------------------------
+            // WebSocket接続が開かれた時のイベントハンドラ
+            //----------------------------------------------
+            socket.onopen = (event) => {
+                console.log("Connected to the WebSocket server");
+            }
+            //----------------------------------------------
+            // WebSocketでメッセージ受信した時のイベントハンドラ
+            //----------------------------------------------
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                const x = data.x;
+                const y = data.y;
+                const ch = data.ch;
+                console.log("Received data:", data);  // 受信データをプリント
+                //for (var i = 0; i < ch.length; i++) {
+                    Plotly.extendTraces('graph', {
+                        x: [[x]],
+                        y: [[y]]
+                    }, [ch]);
+                //}
+            };
+            // ボタンが押されたときにサーバーにメッセージを送信
+            window.sendCommand = function(command) {
+                socket.send(JSON.stringify({ command: command }));
+            };            
+        });
+    </script>
+</head>
+<body>
+    <!-- ナビゲーションバーのインクルード -->
+    <!--#include virtual="navbar.html" -->
+    
+    <h1>Monitor view</h1>
+    <!-- ボタン クリックでソケットサーバへPOSTメッセージを送る-->
+    <form id="control-form">
+        <!-- <button class="favorite styled" type="button" name="command" value="CONNECT"    onclick="sendCommand('CONNECT')">Connect</button>
+        <button class="favorite styled" type="button" name="command" value="DISCONNECT" onclick="sendCommand('DISCONNECT')">DisConnect</button> -->
+        <button class="favorite styled" type="button" name="command" value="START"      onclick="sendCommand('START')">START</button>
+        <!-- <button class="favorite styled" type="button" name="command" value="SEND"       onclick="sendCommand('SEND')">SEND</button>
+        <button class="favorite styled" type="button" name="command" value="STOP"       onclick="sendCommand('STOP')">STOP</button> -->
+    </form>
+    <!-- <textarea id="result-box" rows="2" cols="50" readonly placeholder="Command result will appear here..."></textarea> -->
+
+    <div id="graph" style="width: 100%; height: 500px;"></div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>UH-100P : Help</title>
+</head>
+<body>
+    <header>
+    <!-- ナビゲーションバーのインクルード -->
+    <!--#include virtual="navbar.html" -->
+    </header>
+    <main>
+        <h1>Help</h1>
+    </main>
+
+    <p>Apacheのリブートには、
+        <code>sudo systemctl restart apache2</code>
+    コマンドを使用します。</p>
+
+
+<h1>Pythonスクリプトの自動起動</h1>
+<pre>
+sudo crontab -e
+@reboot python3 /var/www/html/cgi-bin/startup_script.py &
+リブート
+sudo visudo
+www-data ALL=(ALL) NOPASSWD: /sbin/reboot
+を追加している
+</body>
+
+<h2>スタートアップスクリプトの停止方法</h2>
+<code>
+ps aux | grep startupSU
+</code>
+
+pi        1234  0.0  1.2  123456  7890 ?        S    12:34   0:00 python3 /var/www/html/cgi-bin/startup_script.py
+
+sudo kill 1234
+
+
+<h2>シリアルのモニタ</h2>
+<code>bash SerialMon</code> を使用
+停止方法
+Ctrl+A →k Y
+
+
+<h2>仮想環境のアクティベート</h2>
+
+source myenv/bin/activate
+
+<h2>仮想環境の停止</h2>
+
+deactivate
+
+</body>
+</html>

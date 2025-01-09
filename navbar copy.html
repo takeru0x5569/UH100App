@@ -1,0 +1,16 @@
+<script>
+function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.classList.toggle('active');
+}
+</script>
+<div class="navbar">
+    <div class="logo">UH-100P dashbord</div>
+    <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
+    <ul id="menu" class="menu">
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="./record.html">Record</a></li>
+        <li><a href="./setting.html">Settings</a></li>
+        <li><a href="./help.html">Help</a></li>
+    </ul>
+</div>

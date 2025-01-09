@@ -1,0 +1,151 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #9ebdb5, rgb(37, 121, 131));
+    color: aliceblue;
+}
+h1 {
+    font-family: 'monospace';
+    color: yellow;
+    text-align: center;
+    margin-top: 3px;
+    text-shadow: -2px -2px  darkblue;
+}
+code {
+    display: inline-block;
+    padding: 0.1em 0.2em;
+    background-color: darkblue;
+    border-radius: 3px;
+  }
+  pre {
+    padding: 0.1em 0.2em;
+    background-color: darkblue;
+    border-radius: 3px;
+  }
+ /* レスポンシブテンプレートでの画像の横並べとスマホで解除 */
+.two-pic {
+margin: auto;
+text-align: center;
+width: 100%;
+}
+.left-pic {
+display: inline-block;
+padding: 10px;
+}
+.right-pic {
+display: inline-block;
+padding: 10px;
+} 
+/* ボタン ↓*/
+.styled {
+    font-family: 'monospace';
+    border: 0;
+    line-height: 2.5;
+    padding: 0 10px;
+    font-size: 0.9rem;
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    border-radius: 10px;
+    background-color: rgb(18, 235, 206);
+    background-image: linear-gradient(
+      to top left,
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.2) 30%,
+      rgba(0, 0, 0, 0)
+    );
+    box-shadow:
+      inset 2px 2px 3px rgba(255, 255, 255, 0.6),
+      inset -2px -2px 3px rgba(0, 0, 0, 0.6);
+  }
+  .styled:hover {
+    background-color: rgba(255, 0, 0, 1);
+  }
+  .styled:active {
+    box-shadow:
+      inset -2px -2px 3px rgba(255, 255, 255, 0.6),
+      inset 2px 2px 3px rgba(0, 0, 0, 0.6);
+  }
+/* ボタン ↑*/
+
+.navbar {
+    font-family: 'monospace';
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 3px;
+    background-color: #408040;
+    color: white;
+}
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 15px;
+}
+/* マウスホバー */
+.navbar a:hover {
+    color: darkblue;
+    background-color: #00F000;
+}
+.menu-toggle {
+    display: none;
+}
+.menu {
+    color: blue;
+    display: flex;
+    list-style: none;
+    padding: 0;
+}
+/* ナビゲーション */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #408040;
+    color: white;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-list a {
+    text-decoration: none;
+    color: white;
+}
+
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.bar {
+    height: 3px;
+    width: 25px;
+    background-color: white;
+    margin: 3px 0;
+}
+
+/* レスポンシブデザイン */
+@media screen and (max-width: 768px) {
+    .nav-list {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: #333;
+    }
+
+    .nav-list.active {
+        display: flex;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+}

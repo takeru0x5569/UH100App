@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>UH-100P : Setting</title>
+</head>
+<body>
+    <header>
+        <!-- ナビゲーションバーのインクルード -->
+        <!--#include virtual="navbar.html" -->
+    </header>
+    <main>
+        <h1>Settings</h1>
+
+        <form action="/cgi-bin/show_log.py" method="get">
+            <button class="favorite styled" type="submit">Show Log</button>
+        </form>
+
+        <form action="/cgi-bin/reboot.py" method="get">
+            <button class="favorite styled" type="submit">Recording system Reboot</button>
+        </form>
+
+        <!-- ボタン クリックでCGIスクリプトを実行 -->
+        <form action="/cgi-bin/get_ip.py" method="get">
+            <button class="favorite styled" type="submit">CGI test</button>
+        </form>
+
+    </main>
+</body>
+</html>

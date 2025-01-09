@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# シリアルポートデバイスとボーレートの設定
+SERIAL_PORT="/dev/ttyACM0"
+BAUD_RATE="9600"
+
+# screenコマンドを実行してシリアルモニタを開始
+screen $SERIAL_PORT $BAUD_RATE
