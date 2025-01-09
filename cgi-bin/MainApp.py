@@ -13,7 +13,7 @@ from SocketServer import ClsSocketServer
 
 # ログファイルの設定
 LOG_FILE = "/var/www/html/cgi-bin/uh100p_log.txt"
-OLD_LOG_FILE = "/var/www/html/cgi-bin/uh100p_log_old.txt"
+OLD_LOG_FILE = "/var/www/html/cgi-bin/uh100p_old_log.txt"
 index=0
 #-----------------------------------------------------------
 # ログファイルに書き込む関数
@@ -73,7 +73,6 @@ try:
     ser = AsyncSerial(baudRale=9600)
     socket_server = ClsSocketServer()
     socket_server.set_printHandler(lambda msg: print(f"Log: {msg}"))
-
     # キーワードハンドラー登録
     ser.appendHandler("START Data collencion", handlStart)
     ser.appendHandler('STOP Data collection', handlStop)

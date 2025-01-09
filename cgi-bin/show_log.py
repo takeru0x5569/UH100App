@@ -5,7 +5,7 @@ import cgitb
 
 cgitb.enable()
 
-log_file_paths = ["uh100p_log.txt", "uh100p_log_old.txt"]
+log_file_paths = ["uh100p_log.txt", "uh100p_old_log.txt"]
 log_contents = []
 
 for log_file_path in log_file_paths:
