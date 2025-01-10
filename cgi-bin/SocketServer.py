@@ -1,9 +1,10 @@
+import os
+import signal
+import socket
+import subprocess
 import asyncio
 import websockets
-import datetime
-import random
 import json
-
 class ClsSocketServer:
     #-------------------------------------------
     #
@@ -17,6 +18,7 @@ class ClsSocketServer:
         self.index = 0
         self.ch = 0
         self.server = None  # server属性を初期化
+        self.PortNo = 3000  # 使用するポート番号を指定
     #-------------------------------------------
     #受信メッセージのハンドラ登録
     #-------------------------------------------
@@ -62,7 +64,11 @@ class ClsSocketServer:
                 data = json.loads(message)
                 #フィールドの値を抽出
                 command = data.get("command", "")
-                self.__Print(f"抽出されたコマンド: {command}")
+                self.__Print(f"POST command: {command}")
+                if command in self.handlers:
+                    self.handlers[command]()
+                else:
+                    self.__Print(f"Unknown POST command: {command}")
         finally:
             self.client_connected.clear()
     #-------------------------------------------
@@ -83,7 +89,7 @@ class ClsSocketServer:
     #-------------------------------------------
     async def Run(self):
         self.__Print("SocketサーバーRUN")
-        self.server = await websockets.serve(self.handler, '0.0.0.0', 3000)
+        self.server = await websockets.serve(self.handler, '0.0.0.0', self.PortNo)
         self.__Print("SocketサーバーCOnnected")
         await self.server.wait_closed()
         self.__Print("Socketサーバー Closed")
@@ -105,15 +111,29 @@ class ClsSocketServer:
         self.index = index
         self.ch = ch
 
+
+    def free_port(self):
+        """指定したポートを使用しているプロセスを終了させる"""
+        try:
+            result = subprocess.check_output(["lsof", "-i", f":{self.PortNo}"])
+            for line in result.decode().split("\n")[1:]:
+                if line:
+                    pid = int(line.split()[1])
+                    os.kill(pid, signal.SIGKILL)
+                    print(f"プロセス {pid} を終了しました")
+        except subprocess.CalledProcessError:
+            print(f"ポート {self.PortNo} を使用しているプロセスはありません")
 #==================================================================
 #テスト用メインエントリ
 #==================================================================
 if __name__ == "__main__":
     socket_server = ClsSocketServer()
     # テスト用のハンドラ設定
+    socket_server.PortNo=3000 #デバッグ時
     socket_server.addHandler('START', lambda: print("START!!!!!!!!!!!!!!!"))
     socket_server.addHandler('STOP', lambda: print("STOP!!!!!!!!!!!!!!!!!!."))
     socket_server.set_printHandler(lambda msg: print(f"Log: {msg}"))
+    socket_server.free_port()# ポートを解放
 
     async def StartServer():
         print("StartServer")

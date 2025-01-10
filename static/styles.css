@@ -6,44 +6,51 @@ html, body {
     background: linear-gradient(to bottom, #9ec0c0, rgb(37, 121, 131));
     color: aliceblue;
 }
+.header-inner{
+    max-width: 1200px;
+    height: 110px;
+    }
 h1 {
     font-family: 'monospace';
     color: yellow;
     text-align: center;
-    margin-top: 3px;
-    text-shadow: -2px -2px  darkblue;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    /* text-shadow: -2px -2px  darkblue; */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 1); /* テキストシャドウを追加 */
 }
 code {
     display: inline-block;
     padding: 0.1em 0.2em;
     background-color: darkblue;
     border-radius: 3px;
-  }
-  pre {
+}
+pre {
     padding: 0.1em 0.2em;
     background-color: darkblue;
     border-radius: 3px;
-  }
- /* レスポンシブテンプレートでの画像の横並べとスマホで解除 */
+}
+
+/* レスポンシブテンプレートでの画像の横並べとスマホで解除 */
 .two-pic {
-margin: auto;
-text-align: center;
-width: 100%;
+    margin: auto;
+    text-align: center;
+    width: 100%;
 }
 .left-pic {
-display: inline-block;
-padding: 10px;
+    display: inline-block;
+    padding: 10px;
 }
 .right-pic {
-display: inline-block;
-padding: 10px;
+    display: inline-block;
+    padding: 10px;
 } 
 /* ボタン ↓*/
 .styled {
     font-family: 'monospace';
     border: 0;
     line-height: 2.5;
-    padding: 0 10px;
+    padding: 0 5px;
     font-size: 0.9rem;
     text-align: center;
     color: #fff;
@@ -51,43 +58,50 @@ padding: 10px;
     border-radius: 10px;
     background-color: rgb(18, 235, 206);
     background-image: linear-gradient(
-      to top left,
-      rgba(0, 0, 0, 0.2),
-      rgba(0, 0, 0, 0.2) 30%,
-      rgba(0, 0, 0, 0)
+    to top left,
+    rgba(0, 0, 0, 0.2),
+    rgba(0, 0, 0, 0.2) 30%,
+    rgba(0, 0, 0, 0)
     );
     box-shadow:
-      inset 2px 2px 3px rgba(255, 255, 255, 0.6),
-      inset -2px -2px 3px rgba(0, 0, 0, 0.6);
+    inset 2px 2px 3px rgba(255, 255, 255, 0.6),
+    inset -2px -2px 3px rgba(0, 0, 0, 0.6);
   }
-  .styled:hover {
+.styled:hover {
     background-color: rgba(255, 0, 0, 1);
-  }
-  .styled:active {
+}
+.styled:active {
     box-shadow:
-      inset -2px -2px 3px rgba(255, 255, 255, 0.6),
-      inset 2px 2px 3px rgba(0, 0, 0, 0.6);
-  }
+    inset -2px -2px 3px rgba(255, 255, 255, 0.6),
+    inset 2px 2px 3px rgba(0, 0, 0, 0.6);
+}
 /* ボタン ↑*/
 
+
+/* ナビゲーションバー */
 .navbar {
-    font-family: 'monospace';
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0px 3px;
+    padding: 0px 0px;
     background-color: #408040;
     color: white;
 }
 .navbar a {
     color: white;
     text-decoration: none;
-    padding: 8px 15px;
+    padding: 8px 10px;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-right: none;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 1); /* テキストシャドウを追加 */
 }
 /* マウスホバー */
 .navbar a:hover {
+    font-weight: bold;
     color: darkblue;
     background-color: #00F000;
+    text-shadow: 2px 2px 4px white; /* テキストシャドウを追加 */
 }
 .menu-toggle {
     display: none;
@@ -98,36 +112,31 @@ padding: 10px;
     list-style: none;
     padding: 0;
 }
-/* ナビゲーション */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background-color: #408040;
-    color: white;
-}
 
+.navbar .navbar-title  {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    padding: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 1); /* テキストシャドウを追加 */
+}
 .nav-list {
     list-style: none;
     display: flex;
     gap: 1rem;
 }
-
 .nav-list a {
     text-decoration: none;
     color: white;
 }
-
 .menu-toggle {
     display: none;
     flex-direction: column;
     cursor: pointer;
 }
-
 .bar {
     height: 3px;
-    width: 25px;
+    width: 5px;
     background-color: white;
     margin: 3px 0;
 }

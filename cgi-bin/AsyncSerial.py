@@ -87,7 +87,8 @@ class AsyncSerial:
 # 単独で起動
 #================================================================
 if __name__ == '__main__':
-    ser = AsyncSerial(baudRale=9600,portName="/dev/ttyACM0")
+#    ser = AsyncSerial(baudRale=9600,portName="/dev/ttyACM0")
+    ser = AsyncSerial(baudRale=9600)
     print("PortName = " + ser.portName)
     
     #sys.exit()
@@ -95,7 +96,13 @@ if __name__ == '__main__':
     ser.appendHandler("START Data collencion", lambda message: print(f"★☆ 開始:{message}"))
     ser.appendHandler('STOP Data collection', lambda message: print(f"★☆ 停止:{message}"))
     ser.appendHandler("Well_", lambda message: print(f"記録:{message}"))
-    ser.open()
+
+    try:
+        ser.open()
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit()
+    
     try:
         while True:
             message = input(">> Enter message : ")

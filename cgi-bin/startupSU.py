@@ -8,7 +8,8 @@ import psutil
 
 BUTTON_PIN = 3  # プッシュスイッチ用
 LED_PIN = 2     # LED用
-MAIN_APP_NAME = "MainApp.py"
+#MAIN_APP_NAME = "MainApp.py"
+MAIN_APP_NAME = "/var/www/html/cgi-bin/MainApp.py"
 #-----------------------------------------------------------
 # LED点滅関数
 #-----------------------------------------------------------
@@ -49,9 +50,12 @@ def shutdown():
 # MainApp.py 実行検知関数
 #-----------------------------------------------------------
 def is_main_app_running():
-    for proc in psutil.process_iter(['pid', 'name']):
-        if proc.info['name'] == 'python' and MAIN_APP_NAME in proc.cmdline():
-            return True
+    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        try:
+            if 'python' in proc.info['name'] and MAIN_APP_NAME in proc.info['cmdline']:
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
     return False
 
 #============================================================================
