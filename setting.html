@@ -22,7 +22,7 @@
             <button class="favorite styled" type="submit">WiFi Setting</button>
         </form></br>-->
         <!-- ボタン 計測データ削除 -->
-        <form id="update-form" action="/cgi-bin/cleanStrage.py" method="get">
+        <form id="clean-form" action="/cgi-bin/cleanStrage.py" method="get">
             <button class="favorite styled" type="button" onclick="cleanSubmit()">計測データ削除</button>
         </form></br>
         <!-- 再起動 -->
@@ -40,7 +40,7 @@
 <script>
     function cleanSubmit() {
         if (confirm("計測データを削除しますか?")) {
-            document.getElementById('update-form').submit();
+            document.getElementById('clean-form').submit();
         }
     }
 </script>
