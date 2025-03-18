@@ -22,7 +22,7 @@ class AsyncSerial:
             ports = serial.tools.list_ports.comports()
             for port in ports:
                 print(f"デバイス名: {port.device}, 説明: {port.description}, ハードウェアID: {port.hwid}")
-                if('Every' in port.description):
+                if('FT230X' in port.description):
                     self.portName = port.device
     #-------------------------------------------
     # シリアルポートをOpen

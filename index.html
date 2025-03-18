@@ -10,19 +10,19 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
-            // 初期グラフ設定
-            var traceData = [];
-            for (var i = 0; i < 18; i++) {
+            var traceData = [];     //グラフデータ
+            const CH_COUNT = 18;    // CH数を定数として定義
+            for (var i = 0; i < CH_COUNT; i++) {
                 traceData.push({
-                    x: [],
-                    y: [],
-                    mode: 'lines+markers',  // ラインとドットを表示
-                    name: `Well${i}`
+                    x: [],          //
+                    y: [],          //
+                    mode: 'lines+markers',  //ラインとドットを表示
+                    name: `Well${i}`        //グラフ系列名
                 });
             }
             // グラフのレイアウト設定
             var layout = {
-                // title: 'モニタデータ',
+                //title: 'モニタデータ',
                 xaxis: {
                     title: 'Count',
                     gridcolor: '#C0C0C0',
@@ -46,7 +46,7 @@
                     b: 50   // 下余白
                 }
             };
-    
+            //Plotlyグラフライブラリにデータをレイアウト設定を渡す
             Plotly.newPlot('graph', traceData, layout);
     
             //----------------------------------------------
@@ -54,14 +54,14 @@
             //----------------------------------------------
             function connectWebSocket() {
                 const socket = new WebSocket('ws://hnb:3000');
-    
                 //----------------------------------------------
                 // WebSocket接続が開かれた時のイベントハンドラ
                 //----------------------------------------------
                 socket.onopen = (event) => {
                     console.log("Connected to the WebSocket server");
+                    // 初期データを要求するメッセージを送信
+                    socket.send(JSON.stringify({ command: 'REQUEST_INITIAL_DATA' }));
                 };
-    
                 //----------------------------------------------
                 // WebSocketでメッセージ受信した時のイベントハンドラ
                 //----------------------------------------------
@@ -118,15 +118,10 @@
     <h1>Monitor view</h1>
     <!-- ボタン クリックでソケットサーバへPOSTメッセージを送る-->
     <form id="control-form">
-        <!-- <button class="favorite styled" type="button" name="command" value="CONNECT"    onclick="sendCommand('CONNECT')">Connect</button>
-        <button class="favorite styled" type="button" name="command" value="DISCONNECT" onclick="sendCommand('DISCONNECT')">DisConnect</button> -->
         <button class="favorite styled" type="button" name="command" value="START"      onclick="sendCommand('START')">START</button>
         <button class="favorite styled" type="button" name="command" value="START"      onclick="sendCommand('STOP')">STOP</button>
-        <!-- <button class="favorite styled" type="button" name="command" value="SEND"       onclick="sendCommand('SEND')">SEND</button>
-        <button class="favorite styled" type="button" name="command" value="STOP"       onclick="sendCommand('STOP')">STOP</button> -->
     </form>
-    <!-- <textarea id="result-box" rows="2" cols="50" readonly placeholder="Command result will appear here..."></textarea> -->
 
-    <div id="graph" style="width: 100%; height: 70%;"></div>
+    <div id="graph" style="width: 100%; height: 80%; margin:10;"></div>
 </body>
 </html>

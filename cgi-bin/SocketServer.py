@@ -19,6 +19,7 @@ class ClsSocketServer:
         self.ch = 0
         self.server = None  # server属性を初期化
         self.PortNo = 3000  # 使用するポート番号を指定
+        self.backup_data = [] #グラフデータのバックアップを保存するリスト
     #-------------------------------------------
     #受信メッセージのハンドラ登録
     #-------------------------------------------
@@ -35,6 +36,9 @@ class ClsSocketServer:
     def __Print(self, msg):
         if self.print_handler:
             self.print_handler(msg)
+    #バックアップデータのクリア
+    def ResetBackupData(self):
+        self.backup_data = []
     #-------------------------------------------
     #ソケット送信処理
     #-------------------------------------------
@@ -50,6 +54,8 @@ class ClsSocketServer:
                     'ch': self.ch
                 }
                 await websocket.send(json.dumps(data))
+                # バックアップデータに追加
+                self.backup_data.append({self.index,self.val,self.ch})
             await asyncio.sleep(0.1)
     #-------------------------------------------
     #ソケット受信処理
@@ -72,10 +78,19 @@ class ClsSocketServer:
         finally:
             self.client_connected.clear()
     #-------------------------------------------
+    #初期データを送り込む処理
+    #-------------------------------------------
+    async def send_initial_data(self, websocket):
+        pass
+        #global backup_data
+        #for data in backup_data:
+        #    await websocket.send(json.dumps(data))
+    #-------------------------------------------
     #
     #-------------------------------------------
     async def handler(self, websocket):
         self.__Print("Handl tourok")
+        #await self.send_initial_data(websocket)  # 初期データを送信
         consumer_task = asyncio.ensure_future(self.SocketRx(websocket))
         producer_task = asyncio.ensure_future(self.SocketTx(websocket))
         done, pending = await asyncio.wait(
@@ -90,7 +105,7 @@ class ClsSocketServer:
     async def Run(self):
         self.__Print("SocketサーバーRUN")
         self.server = await websockets.serve(self.handler, '0.0.0.0', self.PortNo)
-        self.__Print("SocketサーバーCOnnected")
+        self.__Print("SocketサーバーConected")
         await self.server.wait_closed()
         self.__Print("Socketサーバー Closed")
     #-------------------------------------------
@@ -102,7 +117,7 @@ class ClsSocketServer:
             await self.server.wait_closed()
             self.__Print("サーバーを停止しました")
     #-------------------------------------------
-    #
+    #トリガ送信(新しいデータの存在をクライアントに通知)
     #-------------------------------------------
     def trigger_send(self, ch, index, val):
         # self.__Print("トリガ受信")
@@ -110,8 +125,9 @@ class ClsSocketServer:
         self.val = val
         self.index = index
         self.ch = ch
-
-
+    #-------------------------------------------
+    #ポートの開放
+    #-------------------------------------------
     def free_port(self):
         """指定したポートを使用しているプロセスを終了させる"""
         try:
@@ -130,8 +146,27 @@ if __name__ == "__main__":
     socket_server = ClsSocketServer()
     # テスト用のハンドラ設定
     socket_server.PortNo=3000 #デバッグ時
-    socket_server.addHandler('START', lambda: print("START!!!!!!!!!!!!!!!"))
-    socket_server.addHandler('STOP', lambda: print("STOP!!!!!!!!!!!!!!!!!!."))
+
+    # STARTハンドラの関数(テスト用)を定義
+    def start_handler():
+        socket_server.ResetBackupData()
+        global send_enable
+        send_enable = True
+        print("START!!!!!!!!!!!!!!!!!!.")
+    # STOPハンドラの関数(テスト用)を定義
+    def stop_handler():
+        global send_enable
+        send_enable = False
+        print("STOP!!!!!!!!!!.")
+    #ブラウザリロードハンドラ(テスト用)
+    def reload_handler():
+        print("初期データ要求★★★★")
+        print(socket_server.backup_data)
+    #ハンドラ追加
+    socket_server.addHandler('START', start_handler)
+    socket_server.addHandler('STOP', stop_handler)
+    socket_server.addHandler('REQUEST_INITIAL_DATA', reload_handler)
+
     socket_server.set_printHandler(lambda msg: print(f"Log: {msg}"))
     socket_server.free_port()# ポートを解放
 
@@ -148,10 +183,16 @@ if __name__ == "__main__":
     import time
     val = 1
     index = 0
+    send_enable=False
     try:
         while True:
+            if send_enable==False:
+                time.sleep(0.5)
+                continue
             for ch in range(18):
-                time.sleep(0.5)  # 0.5秒ごとに送信トリガーをセット
+                if send_enable==False:
+                    break
+                time.sleep(0.3)  # 0.5秒ごとに送信トリガーをセット
                 socket_server.trigger_send(ch, index, val)
                 val += 0.2
             val += 10

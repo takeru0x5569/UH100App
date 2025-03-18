@@ -105,6 +105,7 @@ class Recorder:
            self.wellData.Clear()
         #ウェルデータにデータを追加
         self.wellData.Append(int(__ch),int(__sum),int(__idx),float(__air),float(__heat))
+        #ウェルデータ(合計÷サンプル数の結果)とCH番号を返す
         return self.wellData.Data18[__ch],__ch
     #---------------------------------------------
     #CSVファイルに書き込む
@@ -135,7 +136,7 @@ class Recorder:
            self.__csvWrite(__lineData)
         self.isRecording = False
     #---------------------------------------------------------------------
-    #データを記録する
+    #データをTXTファイルとCSVファイルに記録する
     #---------------------------------------------------------------------
     def Record(self,data):
         rtn=None

@@ -15,12 +15,11 @@
         <h1>Help</h1>
     </main>
 
-    <p>Apacheのリブートには、
-        <code>sudo systemctl restart apache2</code>
-    コマンドを使用します。</p>
+<h2>Apacheのリブート</h2>
+<code>sudo systemctl restart apache2</code>
 
 
-<h1>Pythonスクリプトの自動起動</h1>
+<h2>Pythonスクリプトの自動起動</h2>
 <pre>
 sudo crontab -e
 @reboot python3 /var/www/html/cgi-bin/startup_script.py &
@@ -28,7 +27,8 @@ sudo crontab -e
 sudo visudo
 www-data ALL=(ALL) NOPASSWD: /sbin/reboot
 を追加している
-</body>
+</pre>
+
 
 <h2>スタートアップスクリプトの停止方法</h2>
 <code>
@@ -47,12 +47,14 @@ Ctrl+A →k Y
 
 
 <h2>仮想環境のアクティベート</h2>
-
+<code>
 source myenv/bin/activate
+</code>
 
 <h2>仮想環境の停止</h2>
-
+<code>
 deactivate
+</code>
 
 </body>
 </html>

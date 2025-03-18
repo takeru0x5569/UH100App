@@ -6,8 +6,8 @@ import threading
 import os
 import psutil
 
-BUTTON_PIN = 3  # プッシュスイッチ用
-LED_PIN = 2     # LED用
+BUTTON_PIN = 2  # プッシュスイッチ用
+LED_PIN = 4     # LED用
 #MAIN_APP_NAME = "MainApp.py"
 MAIN_APP_NAME = "/var/www/html/cgi-bin/MainApp.py"
 #-----------------------------------------------------------
@@ -50,6 +50,7 @@ def shutdown():
 # MainApp.py 実行検知関数
 #-----------------------------------------------------------
 def is_main_app_running():
+    return True
     for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
         try:
             if 'python' in proc.info['name'] and MAIN_APP_NAME in proc.info['cmdline']:

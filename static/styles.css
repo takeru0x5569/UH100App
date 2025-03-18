@@ -16,7 +16,7 @@ h1 {
     text-align: center;
     margin-top: 2px;
     margin-bottom: 2px;
-    /* text-shadow: -2px -2px  darkblue; */
+    font-size: 1.3rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 1); /* テキストシャドウを追加 */
 }
 code {
@@ -75,8 +75,10 @@ pre {
     inset -2px -2px 3px rgba(255, 255, 255, 0.6),
     inset 2px 2px 3px rgba(0, 0, 0, 0.6);
 }
+.favorite.styled {
+    width: 100px; /* 幅を固定値に設定 */
+}
 /* ボタン ↑*/
-
 
 /* ナビゲーションバー */
 .navbar {

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# プロセス名
+PROCESS_NAME="MainApp.py"
+
+# プロセスIDを取得して終了
+ps aux | grep $PROCESS_NAME | grep -v grep | awk '{print $2}' | xargs -r kill -9
+
+echo "プロセス $PROCESS_NAME を終了しました。"
