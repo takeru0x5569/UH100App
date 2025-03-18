@@ -77,6 +77,7 @@ async def main():
 #
 #----------------------------------------------
 def SequenceStart():
+    socket_server.ResetBackupData()
     ser.send("START/n:")
     log_message("send to serial START command.")
 #----------------------------------------------
@@ -85,6 +86,8 @@ def SequenceStart():
 def SequenceStop():
     ser.send("STOP/n:")
     log_message("send to serial STOP command.")
+def reload_handler():
+    socket_server.send_backup_flag = True
 #============================================================================
 #メイン
 #============================================================================
@@ -108,6 +111,7 @@ ser = AsyncSerial(baudRale=9600)
 socket_server = ClsSocketServer()
 socket_server.addHandler('START', SequenceStart)
 socket_server.addHandler('STOP', SequenceStop)
+socket_server.addHandler('REQUEST_INITIAL_DATA', reload_handler)
 socket_server.set_printHandler(lambda msg: log_message(f"Log: {msg}"))
 socket_server.free_port()# ポートを解放
 #--------------------------------------------
