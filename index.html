@@ -55,7 +55,9 @@
             // WebSocket接続:ホスト名を指定
             //----------------------------------------------
             function connectWebSocket() {
-                const socket = new WebSocket('ws://hnb:3000');
+                const host = window.location.hostname;
+                console.log("host Name:", host);
+                const socket = new WebSocket(`ws://${host}:3000`);
                 //----------------------------------------------
                 // WebSocket接続が開かれた時のイベントハンドラ
                 //----------------------------------------------
