@@ -13,9 +13,11 @@ try:
     command = f'echo {hanabi_password} | su - hanabi -c "cd /var/www/html && git pull origin main"'
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
+    #https://g以降の文字を消す
+    msg = result.stdout.replace("https://", "")
     # コマンドの出力を表示
-    print(result.stdout)
-    print(result.stderr)
+    print(msg)
+    #print(result.stderr)
 
 except Exception as e:
     print(f"エラーが発生しました: {e}")

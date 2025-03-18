@@ -17,19 +17,30 @@
         <form action="/cgi-bin/show_log.py" method="get">
             <button class="favorite styled" type="submit">Show Log</button>
         </form></br>
-        <!-- WiFi設定 -->
+        <!-- WiFi設定 
         <form action="/cgi-bin/wifi_setter.py" method="get">
             <button class="favorite styled" type="submit">WiFi Setting</button>
-        </form></br>
+        </form></br>-->
         <!-- 再起動 -->
         <form action="/cgi-bin/reboot.py" method="get">
-            <button class="favorite styled" type="submit">!! Reboot !!</button>
+            <button class="favorite styled" type="submit">再起動</button>
         </form></br>
         <!-- ボタン クリックでCGIスクリプトを実行 -->
         <form action="/cgi-bin/get_ip.py" method="get">
             <button class="favorite styled" type="submit">CGI test</button>
         </form></br>
+        <!-- ボタン クリックでアップデート -->
+        <form id="update-form" action="/cgi-bin/git_pull.py" method="get">
+            <button class="favorite styled" type="button" onclick="confirmAndSubmit()">ファーム更新</button>
+        </form></br>
 
+<script>
+    function confirmAndSubmit() {
+        if (confirm("ファーム更新を実行しますか?")) {
+            document.getElementById('update-form').submit();
+        }
+    }
+</script>
     </main>
 </body>
 </html>
