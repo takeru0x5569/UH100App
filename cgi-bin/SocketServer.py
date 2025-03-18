@@ -5,6 +5,7 @@ import subprocess
 import asyncio
 import websockets
 import json
+import random
 class ClsSocketServer:
     #-------------------------------------------
     #
@@ -42,16 +43,7 @@ class ClsSocketServer:
     #-------------------------------------------
     def ResetBackupData(self):
         self.backup_data = []
-#    #-------------------------------------------
-#    #バックアップデータを送り込む処理
-#    #-------------------------------------------
-#    async def SendBackupData(self, websocket):
-#        for data in self.backup_data:
-#            await websocket.send(json.dumps({
-#                'x': data['index'],
-#                'y': data['val'],
-#                'ch': data['ch']
-#            }))
+        self.send_backup_flag = False
     #-------------------------------------------
     #ソケット送信処理
     #-------------------------------------------
@@ -60,10 +52,9 @@ class ClsSocketServer:
             await self.client_connected.wait()
             if self.send_backup_flag:
                 self.__Print("Sending backup data")
-                for bd in self.backup_data:
-                    print("--------")
-                    print(bd)
-                    await websocket.send(json.dumps(bd))
+                await websocket.send(json.dumps({'backup_data': self.backup_data}))
+                #for bd in self.backup_data:
+                #    await websocket.send(json.dumps(bd))
                 self.send_backup_flag = False
             if self.SendFlag:
                 self.__Print(f"Tx:id={self.index} val={self.val} ch={self.ch}")
@@ -205,8 +196,9 @@ if __name__ == "__main__":
                 if send_enable==False:
                     break
                 time.sleep(0.3)  # 0.5秒ごとに送信トリガーをセット
-                socket_server.trigger_send(ch, index, val)
-                val += 0.2
+                d=val+(random.randint(0,10)*2)
+                socket_server.trigger_send(ch, index, d)
+                val += 1
             val += 10
             index += 1
     except KeyboardInterrupt:

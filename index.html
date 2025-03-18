@@ -44,7 +44,9 @@
                     r: 50,  // 右余白
                     t: 50,  // 上余白
                     b: 50   // 下余白
-                }
+                },
+                template:"plotly_dark",
+                autosize:true,
             };
             //Plotlyグラフライブラリにデータをレイアウト設定を渡す
             Plotly.newPlot('graph', traceData, layout);
@@ -67,14 +69,26 @@
                 //----------------------------------------------
                 socket.onmessage = function(event) {
                     const data = JSON.parse(event.data);
-                    const x = data.x;
-                    const y = data.y;
-                    const ch = data.ch;
-                    console.log("Received data:", data);  // 受信データをプリント
-                    Plotly.extendTraces('graph', {
-                        x: [[x]],
-                        y: [[y]]
-                    }, [ch]);
+                    if (data.backup_data) {
+                        //バックアップデータのプロット
+                        //console.log("Received backup data:", data.backup_data);
+                        data.backup_data.forEach(item => {
+                            Plotly.extendTraces('graph', {
+                                x: [[item.x]],
+                                y: [[item.y]]
+                            }, [item.ch]);
+                        });
+                    } else {
+                        //最新データのプロット
+                        const x = data.x;
+                        const y = data.y;
+                        const ch = data.ch;
+                        console.log("Received data:", data);  // 受信データをプリント
+                        Plotly.extendTraces('graph', {
+                            x: [[x]],
+                            y: [[y]]
+                        }, [ch]);
+                    }
                 };
     
                 //----------------------------------------------
@@ -94,6 +108,22 @@
     
                 // ボタンが押されたときにサーバーにメッセージを送信
                 window.sendCommand = function(command) {
+                    if (command === 'START') {
+                        // グラフをクリア
+                        Plotly.purge('graph');
+                        // traceDataをクリア
+                        traceData = [];
+                        for (var i = 0; i < CH_COUNT; i++) {
+                            traceData.push({
+                                x: [],
+                                y: [],
+                                mode: 'lines+markers',
+                                name: `Well${i}`
+                            });
+                        }                        
+                        // 新しいグラフを作成
+                        Plotly.newPlot('graph', traceData, layout);
+                    }
                     socket.send(JSON.stringify({ command: command }));
                 };
             }
@@ -119,7 +149,7 @@
     <!-- ボタン クリックでソケットサーバへPOSTメッセージを送る-->
     <form id="control-form">
         <button class="favorite styled" type="button" name="command" value="START"      onclick="sendCommand('START')">START</button>
-        <button class="favorite styled" type="button" name="command" value="START"      onclick="sendCommand('STOP')">STOP</button>
+        <button class="favorite styled" type="button" name="command" value="STOP"      onclick="sendCommand('STOP')">STOP</button>
     </form>
 
     <div id="graph" style="width: 100%; height: 80%; margin:10;"></div>
