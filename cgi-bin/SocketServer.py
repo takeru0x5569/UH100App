@@ -20,6 +20,7 @@ class ClsSocketServer:
         self.server = None  # server属性を初期化
         self.PortNo = 3000  # 使用するポート番号を指定
         self.backup_data = [] #グラフデータのバックアップを保存するリスト
+        self.send_backup_flag = False  # バックアップデータ送信フラグ
     #-------------------------------------------
     #受信メッセージのハンドラ登録
     #-------------------------------------------
@@ -36,15 +37,34 @@ class ClsSocketServer:
     def __Print(self, msg):
         if self.print_handler:
             self.print_handler(msg)
+    #-------------------------------------------
     #バックアップデータのクリア
+    #-------------------------------------------
     def ResetBackupData(self):
         self.backup_data = []
+#    #-------------------------------------------
+#    #バックアップデータを送り込む処理
+#    #-------------------------------------------
+#    async def SendBackupData(self, websocket):
+#        for data in self.backup_data:
+#            await websocket.send(json.dumps({
+#                'x': data['index'],
+#                'y': data['val'],
+#                'ch': data['ch']
+#            }))
     #-------------------------------------------
     #ソケット送信処理
     #-------------------------------------------
     async def SocketTx(self, websocket):
         while True:
             await self.client_connected.wait()
+            if self.send_backup_flag:
+                self.__Print("Sending backup data")
+                for bd in self.backup_data:
+                    print("--------")
+                    print(bd)
+                    await websocket.send(json.dumps(bd))
+                self.send_backup_flag = False
             if self.SendFlag:
                 self.__Print(f"Tx:id={self.index} val={self.val} ch={self.ch}")
                 self.SendFlag = False
@@ -55,7 +75,7 @@ class ClsSocketServer:
                 }
                 await websocket.send(json.dumps(data))
                 # バックアップデータに追加
-                self.backup_data.append({self.index,self.val,self.ch})
+                self.backup_data.append(data)
             await asyncio.sleep(0.1)
     #-------------------------------------------
     #ソケット受信処理
@@ -78,19 +98,9 @@ class ClsSocketServer:
         finally:
             self.client_connected.clear()
     #-------------------------------------------
-    #初期データを送り込む処理
-    #-------------------------------------------
-    async def send_initial_data(self, websocket):
-        pass
-        #global backup_data
-        #for data in backup_data:
-        #    await websocket.send(json.dumps(data))
-    #-------------------------------------------
     #
     #-------------------------------------------
     async def handler(self, websocket):
-        self.__Print("Handl tourok")
-        #await self.send_initial_data(websocket)  # 初期データを送信
         consumer_task = asyncio.ensure_future(self.SocketRx(websocket))
         producer_task = asyncio.ensure_future(self.SocketTx(websocket))
         done, pending = await asyncio.wait(
@@ -161,7 +171,9 @@ if __name__ == "__main__":
     #ブラウザリロードハンドラ(テスト用)
     def reload_handler():
         print("初期データ要求★★★★")
-        print(socket_server.backup_data)
+        socket_server.send_backup_flag = True
+        #socket_server.SendBackupData()
+        #print(socket_server.backup_data)
     #ハンドラ追加
     socket_server.addHandler('START', start_handler)
     socket_server.addHandler('STOP', stop_handler)
