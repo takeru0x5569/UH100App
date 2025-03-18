@@ -76,7 +76,7 @@ pre {
     inset 2px 2px 3px rgba(0, 0, 0, 0.6);
 }
 .favorite.styled {
-    width: 100px; /* 幅を固定値に設定 */
+    width: 120px; /* 幅を固定値に設定 */
 }
 /* ボタン ↑*/
 

@@ -21,6 +21,10 @@
         <form action="/cgi-bin/wifi_setter.py" method="get">
             <button class="favorite styled" type="submit">WiFi Setting</button>
         </form></br>-->
+        <!-- ボタン 計測データ削除 -->
+        <form id="update-form" action="/cgi-bin/cleanStrage.py" method="get">
+            <button class="favorite styled" type="button" onclick="cleanSubmit()">計測データ削除</button>
+        </form></br>
         <!-- 再起動 -->
         <form action="/cgi-bin/reboot.py" method="get">
             <button class="favorite styled" type="submit">再起動</button>
@@ -33,7 +37,13 @@
         <form id="update-form" action="/cgi-bin/git_pull.py" method="get">
             <button class="favorite styled" type="button" onclick="confirmAndSubmit()">ファーム更新</button>
         </form></br>
-
+<script>
+    function cleanSubmit() {
+        if (confirm("計測データを削除しますか?")) {
+            document.getElementById('update-form').submit();
+        }
+    }
+</script>
 <script>
     function confirmAndSubmit() {
         if (confirm("ファーム更新を実行しますか?")) {
@@ -41,6 +51,9 @@
         }
     }
 </script>
+
+
+
     </main>
 </body>
 </html>
