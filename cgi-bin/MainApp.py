@@ -86,6 +86,7 @@ def SequenceStart():
 def SequenceStop():
     ser.send("STOP/n:")
     log_message("send to serial STOP command.")
+#----------------------------------------------
 def reload_handler():
     socket_server.send_backup_flag = True
 #============================================================================
@@ -109,6 +110,7 @@ rec=Recorder("/var/www/html/LOG")
 ser = AsyncSerial(baudRale=9600)
 #ソケットサーバーインスタンス
 socket_server = ClsSocketServer()
+socket_server.PortNo=3000 #デバッグ時
 socket_server.addHandler('START', SequenceStart)
 socket_server.addHandler('STOP', SequenceStop)
 socket_server.addHandler('REQUEST_INITIAL_DATA', reload_handler)

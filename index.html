@@ -62,9 +62,9 @@
                 // WebSocket接続が開かれた時のイベントハンドラ
                 //----------------------------------------------
                 socket.onopen = (event) => {
-                    console.log("Connected to the WebSocket server");
+                    console.log("Reload request");
                     // 初期データを要求するメッセージを送信
-                    socket.send(JSON.stringify({ command: 'REQUEST_INITIAL_DATA' }));
+                    socket.send(JSON.stringify({ command: 'REQUEST_INITIAL_DATA'}));
                 };
                 //----------------------------------------------
                 // WebSocketでメッセージ受信した時のイベントハンドラ
@@ -150,8 +150,8 @@
     <h1>Monitor view</h1>
     <!-- ボタン クリックでソケットサーバへPOSTメッセージを送る-->
     <form id="control-form">
-        <button class="favorite styled" type="button" name="command" value="START"      onclick="sendCommand('START')">START</button>
-        <button class="favorite styled" type="button" name="command" value="STOP"      onclick="sendCommand('STOP')">STOP</button>
+        <button class="favorite styled" type="button" name="command" value="START" onclick="sendCommand('START')">START</button>
+        <button class="favorite styled" type="button" name="command" value="STOP"  onclick="sendCommand('STOP')">STOP</button>
     </form>
 
     <div id="graph" style="width: 100%; height: 80%; margin:10;"></div>

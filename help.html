@@ -32,12 +32,8 @@ www-data ALL=(ALL) NOPASSWD: /sbin/reboot
 
 <h2>スタートアップスクリプトの停止方法</h2>
 <code>
-ps aux | grep startupSU
+./Kill_MainApp
 </code>
-
-pi        1234  0.0  1.2  123456  7890 ?        S    12:34   0:00 python3 /var/www/html/cgi-bin/startup_script.py
-
-sudo kill 1234
 
 
 <h2>シリアルのモニタ</h2>
