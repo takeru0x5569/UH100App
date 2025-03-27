@@ -30,24 +30,21 @@ def group_files_by_date(files):
 #====================================================================
 # ファイル名を日付ごとにグルーピング
 #====================================================================
-def group_files_by_date_and_time(files):
+def group_files_by_date(files):
     grouped = defaultdict(list)
     for file in files:
-        # ファイル名から日付部分と時刻部分を抽出 (例: 2025(0327)1246-50.csv -> 03271246)
+        # ファイル名から日付部分と時刻部分を抽出 (例: 2025(0327)1246-50.csv -> 0327, 1246)
         if '(' in file and ')' in file:
             date_part = file.split('(')[1].split(')')[0]
             time_part = file.split(')')[1][:4]  # 時刻部分を取得 (例: 1246)
-            datetime_key = date_part + time_part  # 日付と時刻を結合
-            grouped[datetime_key].append(file)
+            grouped[date_part].append((time_part, file))  # 時刻とファイル名をペアで保存
     return grouped
 #====================================================================
 # メイン
 #====================================================================
 cgitb.enable()
 csv_files = list_csv_files(LOG_STRAGE_DIR)
-grouped_files = group_files_by_date_and_time(csv_files)
-# 日付と時刻順にソート（新しいものが上に来るように逆順にソート）
-sorted_grouped_files = sorted(grouped_files.items(), key=lambda x: datetime.strptime(x[0], "%m%d%H%M"), reverse=True)
+grouped_files = group_files_by_date(csv_files)
 
 print("Content-Type: text/html")
 print()
@@ -57,21 +54,23 @@ print('summary { cursor: pointer; font-weight: bold; }')
 print('</style>')
 print('<h1>CSVファイル一覧</h1>')
 
-for datetime_key, files in sorted_grouped_files:
+# 日付ごとに処理
+for date_part, files in sorted(grouped_files.items(), key=lambda x: datetime.strptime(x[0], "%m%d"), reverse=True):
     # 日付部分を「月日」に変換 (例: 0327 -> 3月27日)
-    date_part = datetime_key[:4]
-    time_part = datetime_key[4:]
     formatted_date = datetime.strptime(date_part, "%m%d").strftime("%-m月%-d日")
-    formatted_time = datetime.strptime(time_part, "%H%M").strftime("%H:%M")
     print(f'<details>')
-    print(f'<summary>{formatted_date} {formatted_time} のファイル ({len(files)}件)</summary>')
+    print(f'<summary>{formatted_date} のファイル ({len(files)}件)</summary>')
     print('<ul>')
-    for file in files:
+    
+    # 時刻順にソートして表示
+    for time_part, file in sorted(files, key=lambda x: x[0], reverse=True):
+        formatted_time = datetime.strptime(time_part, "%H%M").strftime("%H:%M")
         csv_path = os.path.join(LOG_STRAGE_DIR, file)
         txt_path = csv_path[:-4] + ".txt"
         txt_body = os.path.basename(txt_path)
         print('<li>')
-        print(f'<a href="{csv_path}" download>{file}</a> | ')
+        print(f'{formatted_time}  | ')
+        print(f'<a href="{csv_path}" download>{file}</a> |')
         print(f'<a href="{txt_path}" download>{txt_body}</a>')
         print('</li>')
     print('</ul>')
