@@ -18,7 +18,11 @@ def blink_led():
     count = 0
     while blinking:  # スクリプト稼働中はループ
         if GPIO.input(BUTTON_PIN)==GPIO.HIGH:
-            count = 0
+            if count > 0:
+                #ファイルを作成
+                print("IP再送")
+                f = open('/var/www/html/cgi-bin/ResendIP.txt', 'w')
+            count = 0 #カウントクリア
             #ledState = not ledState # 現在のledStateを反転させる
             #if ledState == GPIO.HIGH:
             GPIO.output(LED_PIN, GPIO.HIGH)
@@ -50,7 +54,6 @@ def shutdown():
 # MainApp.py 実行検知関数
 #-----------------------------------------------------------
 def is_main_app_running():
-    return True
     for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
         try:
             if 'python' in proc.info['name'] and MAIN_APP_NAME in proc.info['cmdline']:

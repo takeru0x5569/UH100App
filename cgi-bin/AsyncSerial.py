@@ -69,12 +69,16 @@ class AsyncSerial:
             if self.serialObj:
                 try:
                     data = self.serialObj.read(1)  #1文字ずつ読み込み(realine()だと改行受信するまで制御が返ってこないので)
-                    if data:
-                        char = data.decode('utf-8')
+                    if data is not None:  # データが存在する場合のみ処理
+                        try:
+                            char = data.decode('utf-8')  # UTF-8でデコード
+                        except UnicodeDecodeError:
+                            print(f"デコードエラー: {data}")
+                            continue  # デコードに失敗した場合は次のループへ
                         if char == '\n':  # 改行コードでメッセージ終了
                             message = buffer.strip()
                             buffer = ""
-                            print(f"Received: {message}")
+                            #print(f"Received: {message}")
                             self.handle_message(message)
                         # バックスペースキーまたはデリートキー
                         elif char == '\b' or char == '\x7f':  
@@ -82,7 +86,7 @@ class AsyncSerial:
                         else:
                             buffer += char
                 except Exception as e:
-                    print(f"rxLoop Error: {e}")
+                    print(f"ser rxLoop Error: {e}")
 #================================================================
 # 単独で起動
 #================================================================
@@ -95,7 +99,7 @@ if __name__ == '__main__':
     # キーワードハンドラー登録
     ser.appendHandler("START Data collencion", lambda message: print(f"★☆ 開始:{message}"))
     ser.appendHandler('STOP Data collection', lambda message: print(f"★☆ 停止:{message}"))
-    ser.appendHandler("Well_", lambda message: print(f"記録:{message}"))
+    ser.appendHandler("Well_", lambda message: print(f"受信:{message}"))
 
     try:
         ser.open()
