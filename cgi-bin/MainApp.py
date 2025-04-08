@@ -63,8 +63,8 @@ def handlWellData(message):
         #CH番号は若い方に飛んだらインデックスを増やす
         if old_ch>ch:
             index += 1
-        # データが取得できた場合、ソケットサーバーに送信
-        socket_server.trigger_send(ch=ch, index=index, val=well_value)
+        # データが取得できた場合、ソケットサーバーウェルデータを渡す
+        socket_server.set_well_data(ch=ch, index=index, val=well_value)
         #今のCHを次回のOLDチャンネルとして保存
         old_ch=ch
     except Exception as e:

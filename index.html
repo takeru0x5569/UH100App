@@ -73,12 +73,22 @@
                     const data = JSON.parse(event.data);
                     if (data.backup_data) {
                         //バックアップデータのプロット
-                        //console.log("Received backup data:", data.backup_data);
+                        // バックアップデータをチャネルごとにグループ化
+                        const groupedData = {};
                         data.backup_data.forEach(item => {
+                            if (!groupedData[item.ch]) {
+                                groupedData[item.ch] = { x: [], y: [] };
+                            }
+                            groupedData[item.ch].x.push(item.x);
+                            groupedData[item.ch].y.push(item.y);
+                        });
+
+                        // グループ化したデータを一括でプロット
+                        Object.keys(groupedData).forEach(ch => {
                             Plotly.extendTraces('graph', {
-                                x: [[item.x]],
-                                y: [[item.y]]
-                            }, [item.ch]);
+                                x: [groupedData[ch].x],
+                                y: [groupedData[ch].y]
+                            }, [parseInt(ch)]);
                         });
                     } else {
                         //最新データのプロット
@@ -90,6 +100,10 @@
                             x: [[x]],
                             y: [[y]]
                         }, [ch]);
+                        // 最新データをHTMLに表示
+                        document.getElementById('latest-ch').textContent = `CH: ${ch}`;
+                        document.getElementById('latest-y').textContent = `Y: ${y.toFixed(3)}`;
+
                     }
                 };
     
@@ -153,7 +167,9 @@
         <button class="favorite styled" type="button" name="command" value="START" onclick="sendCommand('START')">START</button>
         <button class="favorite styled" type="button" name="command" value="STOP"  onclick="sendCommand('STOP')">STOP</button>
     </form>
-
+    <div id="latest-data" style="margin-top: 20px; font-size: 16px; color: black; background-color: aliceblue;">
+        最新データ: <span id="latest-ch">CH: -</span>, <span id="latest-y">Y: -</span>
+    </div>
     <div id="graph" style="width: 100%; height: 80%; margin:10;"></div>
 </body>
 </html>

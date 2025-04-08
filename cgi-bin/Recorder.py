@@ -19,6 +19,7 @@ class ClsWellData:
         self.Data18 = [None for i in range(self.WELL_NUMBER)]    #18chのウェルデータを格納するリスト
         self.tempHeater = 0.0   #ヒーター温度
         self.tempAir = 0.0      #大気温度
+        self.bias = 0.0         #バイアス値
     #データをクリアする
     def Clear(self):
         self.wellDataEmpty = True
@@ -30,22 +31,23 @@ class ClsWellData:
             __ret = True
         return __ret
     #データを追加する
-    def Append(self,ch,sum,idx,air,heat):
-        #初めてデータを追加する場合は現在時刻と温度を代表として記録
+    def Append(self,ch,sum,idx,air,heat,bias):
+        #初めてデータを追加する場合は現在時刻と代表値を記録
         if self.wellDataEmpty==True:
             self.recTime= datetime.datetime.now()   #記録時刻
-            self.tempAir = air
-            self.tempHeater = heat
+            self.tempAir = air   #大気温度代表値
+            self.tempHeater = heat #ヒーター温度代表値
+            self.bias = bias #バイアス値代表値
             self.wellDataEmpty = False
         #データをリストに追加
         logging.debug("-------------------")
-        logging.debug(f"CH:{ch} sum:{sum} idx:{idx} air:{air} heat:{heat}")
+        logging.debug(f"CH:{ch} sum:{sum} idx:{idx} air:{air} heat:{heat} Bias:{bias}")
         logging.debug("-------------------")
         self.Data18[ch] = sum / idx # 平均値を計算して格納
     #CSVの１行分に成形して返す
     def PrintOut(self):
         #時間、大気温度、ヒーター温度、18chのデータをリストにして返す
-        ret=[self.recTime.strftime("%Y/%m/%d %H:%M:%S"),self.tempAir,self.tempHeater,*self.Data18]
+        ret=[self.recTime.strftime("%Y/%m/%d %H:%M:%S"),self.tempAir,self.tempHeater,*self.Data18,self.bias]
         # ret=self.recTime.strftime("%Y/%m/%d %H:%M:%S")
         # ret += "," + str(self.tempAir)
         # ret += "," + str(self.tempHeater)
@@ -84,7 +86,7 @@ class Recorder:
             writer = csv.writer(f)
             #CSVタイトル行書込み
             writer.writerow(["time","TempAir","TempHeater",
-                             "CH1","CH2","CH3","CH4","CH5","CH6","CH7","CH8","CH9","CH10","CH11","CH12","CH13","CH14","CH15","CH16","CH17","CH18"])
+                             "CH1","CH2","CH3","CH4","CH5","CH6","CH7","CH8","CH9","CH10","CH11","CH12","CH13","CH14","CH15","CH16","CH17","CH18","Bias"])
     #---------------------------------------------
     #CSV形式に成形:入力は　「CH:合計値:サンプル数:大気温度:ヒーター温度」の形式 ex CH0: 500:10:24.5:62.5
     #---------------------------------------------
@@ -96,6 +98,12 @@ class Recorder:
         __idx = float(__dt[2])     #サンプル数
         __air = float(__dt[3])     #大気温度
         __heat = float(__dt[4])    #ヒーター温度
+        #要素が６つ以上ある場合はバイアス値を取得する
+        if len(__dt) > 5:
+            __bias = float(__dt[5])    #バイアス値
+        else:
+            __bias = 0.0               #バイアス値が無い場合は0.0を入れる   
+
         __ch = __ch - 1            #リストのインデックスに合わせるために-1する
         #ウェルデータの対象CHが空で無い場合はデータを吐き出してクリア
         if self.wellData.IsEmpty(__ch)==False:
@@ -104,7 +112,7 @@ class Recorder:
            logging.debug(__lineData)
            self.wellData.Clear()
         #ウェルデータにデータを追加
-        self.wellData.Append(int(__ch),int(__sum),int(__idx),float(__air),float(__heat))
+        self.wellData.Append(int(__ch),int(__sum),int(__idx),float(__air),float(__heat),float(__bias))
         #ウェルデータ(合計÷サンプル数の結果)とCH番号を返す
         return self.wellData.Data18[__ch],__ch
     #---------------------------------------------
@@ -166,25 +174,25 @@ if __name__ == "__main__":
     #
     rec=Recorder("../LOG") #DATA_DIR="/home/hanabi/MH100data"
     rec.Start()
-
-    print(rec.Record( "Well_1:1000:100:23.4:26.89"))
-    print(rec.Record( "Well_2:2000:100:23.4:26.89"))
-    print(rec.Record( "Well_3:3000:100:23.4:26.89"))
-    print(rec.Record( "Well_4:4000:100:23.4:26.89"))
-    print(rec.Record( "Well_5:5000:100:23.4:26.89"))
-    print(rec.Record( "Well_6:6000:100:23.4:26.89"))
-    print(rec.Record( "Well_7:7000:100:23.4:26.89"))
-    print(rec.Record( "Well_8:8000:100:23.4:26.89"))
-    print(rec.Record( "Well_9:9000:100:23.4:26.89"))
-    print(rec.Record("Well_10:10000:100:23.4:26.89"))
-    print(rec.Record("Well_11:11000:100:23.4:26.89"))
-    print(rec.Record("Well_12:12000:100:23.4:26.89"))
-    print(rec.Record("Well_13:13000:100:23.4:26.89"))
-    print(rec.Record("Well_14:14000:100:23.4:26.89"))
-    print(rec.Record("Well_15:15000:100:23.4:26.89"))
-    print(rec.Record("Well_16:16000:100:23.4:26.89"))
-    print(rec.Record("Well_17:17000:100:23.4:26.89"))
-    print(rec.Record("Well_18:18000:100:23.4:26.89"))
+    # ウェルバン番号:合計値：サンプル数：大気温度：ヒーター温度:バイアス値
+    print(rec.Record( "Well_1:1000:100:23.4:26.89:100"))
+    print(rec.Record( "Well_2:2000:100:23.4:26.89:101"))
+    print(rec.Record( "Well_3:3000:100:23.4:26.89:102"))
+    print(rec.Record( "Well_4:4000:100:23.4:26.89:103"))
+    print(rec.Record( "Well_5:5000:100:23.4:26.89:104"))
+    print(rec.Record( "Well_6:6000:100:23.4:26.89:105"))
+    print(rec.Record( "Well_7:7000:100:23.4:26.89:106"))
+    print(rec.Record( "Well_8:8000:100:23.4:26.89:107"))
+    print(rec.Record( "Well_9:9000:100:23.4:26.89:108"))
+    print(rec.Record("Well_10:10000:100:23.4:26.89:109"))
+    print(rec.Record("Well_11:11000:100:23.4:26.89:110"))
+    print(rec.Record("Well_12:12000:100:23.4:26.89:111"))
+    print(rec.Record("Well_13:13000:100:23.4:26.89:112"))
+    print(rec.Record("Well_14:14000:100:23.4:26.89:113"))
+    print(rec.Record("Well_15:15000:100:23.4:26.89:114"))
+    print(rec.Record("Well_16:16000:100:23.4:26.89:115"))
+    print(rec.Record("Well_17:17000:100:23.4:26.89:116"))
+    print(rec.Record("Well_18:18000:100:23.4:26.89:117"))
     rec.Stop()
 
 

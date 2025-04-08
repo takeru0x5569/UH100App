@@ -109,7 +109,7 @@ if __name__ == '__main__':
     
     try:
         while True:
-            message = input(">> Enter message : ")
+            message = input(">> message to Serial : ")
             ser.send(message)
     except KeyboardInterrupt:
         print("\nExiting program...")

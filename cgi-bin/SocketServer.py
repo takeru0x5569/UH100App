@@ -18,10 +18,11 @@ class ClsSocketServer:
         self.val = 0
         self.index = 0
         self.ch = 0
-        self.server = None  # server属性を初期化
-        self.PortNo = 3000  # 使用するポート番号を指定
-        self.backup_data = [] #グラフデータのバックアップを保存するリスト
+        self.server = None      # server属性を初期化
+        self.PortNo = 3000      # 使用するポート番号を指定
+        self.backup_data = []   #グラフデータのバックアップを保存するリスト
         self.send_backup_flag = False  # バックアップデータ送信フラグ
+        self.well_data=None
     #-------------------------------------------
     #受信メッセージのハンドラ登録
     #-------------------------------------------
@@ -49,24 +50,18 @@ class ClsSocketServer:
     #-------------------------------------------
     async def SocketTx(self, websocket):
         while True:
-            await self.client_connected.wait()
+            await self.client_connected.wait()#クライアント接続を待つ
             if self.send_backup_flag:
-                self.__Print("Sending backup data")
+                '''バックアップデータを送信'''
+                #self.__Print("Sending backup data")
                 await websocket.send(json.dumps({'backup_data': self.backup_data}))
-                #for bd in self.backup_data:
-                #    await websocket.send(json.dumps(bd))
                 self.send_backup_flag = False
-            if self.SendFlag:
+            elif self.SendFlag: #バックアップを送った際には最新データ送信は控えたいのでelif
                 self.__Print(f"Tx:id={self.index} val={self.val} ch={self.ch}")
-                self.SendFlag = False
-                data = {
-                    'x': self.index,
-                    'y': self.val,
-                    'ch': self.ch
-                }
-                await websocket.send(json.dumps(data))
-                # バックアップデータに追加
-                self.backup_data.append(data)
+                #最新データを送る
+                await websocket.send(json.dumps(self.well_data))
+
+            self.SendFlag = False #バックアップデータ送信でもラストOneデータ送信でもフラグ落とす
             await asyncio.sleep(0.1)
     #-------------------------------------------
     #ソケット受信処理
@@ -110,7 +105,7 @@ class ClsSocketServer:
         await self.server.wait_closed()
         self.__Print("Socketサーバー Closed")
     #-------------------------------------------
-    #
+    #停止処理
     #-------------------------------------------
     async def stop(self):
         if self.server:
@@ -118,14 +113,21 @@ class ClsSocketServer:
             await self.server.wait_closed()
             self.__Print("サーバーを停止しました")
     #-------------------------------------------
-    #トリガ送信(新しいデータの存在をクライアントに通知)
+    #ウェルデータのセット
     #-------------------------------------------
-    def trigger_send(self, ch, index, val):
+    def set_well_data(self, ch, index, val):
         # self.__Print("トリガ受信")
         self.SendFlag = True
         self.val = val
         self.index = index
         self.ch = ch
+        self.well_data = {
+            'x': self.index,
+            'y': self.val,
+            'ch': self.ch
+        }
+        # バックアップデータに追加
+        self.backup_data.append(self.well_data)
     #-------------------------------------------
     #ポートの開放
     #-------------------------------------------
@@ -186,7 +188,7 @@ if __name__ == "__main__":
     import time
     val = 1
     index = 0
-    send_enable=False
+    send_enable=True
     try:
         while True:
             if send_enable==False:
