@@ -118,8 +118,9 @@ pre {
 .navbar .navbar-title  {
     font-size: 1.5rem;
     font-weight: bold;
-    color: white;
+    color: yellow;
     padding: 10px;
+    font-style: italic; /* 斜体を追加 */
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 1); /* テキストシャドウを追加 */
 }
 .nav-list {
