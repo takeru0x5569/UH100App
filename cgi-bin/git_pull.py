@@ -24,7 +24,7 @@ try:
         for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
             try:
                 # プロセス名とコマンドラインを厳密にチェック
-                if proc.info['name'] == 'python' and proc.info['cmdline'] and 'MainApp.py' in proc.info['cmdline']:
+                if proc.info['name'] == 'python3' and proc.info['cmdline'] and '/var/www/html/cgi-bin/MainApp.py' in proc.info['cmdline']:
                     print(f"<p>停止対象プロセス検出: PID={proc.info['pid']}, CMDLINE={' '.join(proc.info['cmdline'])}</p>")
                     try:
                         proc.terminate()  # プロセスを停止
