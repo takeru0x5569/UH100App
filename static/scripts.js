@@ -1,9 +1,9 @@
-const mobileMenu = document.getElementById('mobile-menu');
+//const mobileMenu = document.getElementById('mobile-menu');
 const navList = document.querySelector('.nav-list');
 
-mobileMenu.addEventListener('click', () => {
-    navList.classList.toggle('active');
-});
+//mobileMenu.addEventListener('click', () => {
+//    navList.classList.toggle('active');
+//});
 
 //=============================================================
 // 非同期でPOSTリクエストを送信

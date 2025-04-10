@@ -57,7 +57,7 @@ class ClsSocketServer:
                 await websocket.send(json.dumps({'backup_data': self.backup_data}))
                 self.send_backup_flag = False
             elif self.SendFlag: #バックアップを送った際には最新データ送信は控えたいのでelif
-                self.__Print(f"Tx:id={self.index} val={self.val} ch={self.ch}")
+                #self.__Print(f"Tx:id={self.index} val={self.val} ch={self.ch}")
                 #最新データを送る
                 await websocket.send(json.dumps(self.well_data))
 

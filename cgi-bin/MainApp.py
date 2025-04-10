@@ -83,14 +83,14 @@ async def main():
 #----------------------------------------------
 def SequenceStart():
     socket_server.ResetBackupData()
-    rec.Start()#レコーダーの記録開始
+    #rec.Start()#レコーダーの記録開始→ArduinoがSTARTを送信してくるので不要
     ser.send("START/n:")
     log_message("send to serial START command.")
 #----------------------------------------------
 #
 #----------------------------------------------
 def SequenceStop():
-    rec.Stop()#レコーダーを止める
+    #rec.Stop()#レコーダーを止める→ArduinoがSTOPを送信してくるので、ここでは止めなくても止まる
     ser.send("STOP/n:")
     log_message("send to serial STOP command.")
 #----------------------------------------------
@@ -121,7 +121,7 @@ socket_server.PortNo=3000 #デバッグ時
 socket_server.addHandler('START', SequenceStart)
 socket_server.addHandler('STOP', SequenceStop)
 socket_server.addHandler('REQUEST_INITIAL_DATA', reload_handler)
-socket_server.set_printHandler(lambda msg: log_message(f"Log: {msg}"))
+socket_server.set_printHandler(lambda msg: log_message(f"socket: {msg}"))
 socket_server.free_port()# ポートを解放
 #--------------------------------------------
 # シリアル受信キーワードハンドラー登録
@@ -135,6 +135,7 @@ try:
     ser.open()
 except Exception as e:
     print(f"Serial port open Error: {e}")
+    log_message(f"Serial port open Error: {e}")
     sys.exit()
 # シリアルオープンできたならIPを送って表示させる
 time.sleep(2)
@@ -176,7 +177,7 @@ else:
             time.sleep(10)  #
             ip_address = IpAddress_Get.get_my_ip_address()
             ser.send("IP:"+ip_address)
-            log_message("IP:"+ip_address)
+            #log_message("IP:"+ip_address)
     except Exception as e:
         log_message(f"BG例外が発生: {e}")
     finally:

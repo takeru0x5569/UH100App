@@ -17,7 +17,7 @@
                     x: [],          //
                     y: [],          //
                     mode: 'lines+markers',  //ラインとドットを表示
-                    name: `Well${i}`        //グラフ系列名
+                    name: `Well${i+1}`        //グラフ系列名
                 });
             }
             // グラフのレイアウト設定
@@ -101,8 +101,8 @@
                             y: [[y]]
                         }, [ch]);
                         // 最新データをHTMLに表示
-                        document.getElementById('latest-ch').textContent = `CH: ${ch}`;
-                        document.getElementById('latest-y').textContent = `Y: ${y.toFixed(3)}`;
+                        document.getElementById('latest-ch').textContent = `Well: ${ch+1}`;//Index0オリジンだけど1chからにしたい
+                        document.getElementById('latest-y').textContent = `Value: ${y.toFixed(3)}`;
 
                     }
                 };
@@ -168,7 +168,7 @@
         <button class="favorite styled" type="button" name="command" value="STOP"  onclick="sendCommand('STOP')">STOP</button>
     </form>
     <div id="latest-data" style="margin-top: 20px; font-size: 16px; color: black; background-color: aliceblue;">
-        最新データ: <span id="latest-ch">CH: -</span>, <span id="latest-y">Y: -</span>
+        最新データ: <span id="latest-ch">Well: -</span>, <span id="latest-y">Value: -</span>
     </div>
     <div id="graph" style="width: 100%; height: 80%; margin:10;"></div>
 </body>
