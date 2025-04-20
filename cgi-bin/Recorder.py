@@ -16,6 +16,8 @@ class ClsWellData:
     def __init__(self):
         self.wellDataEmpty = True
         self.recTime= datetime.datetime.now()   #記録時刻
+        self.isFirstData = True #初回データフラグ
+        self.startTime=None
         self.Data18 = [None for i in range(self.WELL_NUMBER)]    #18chのウェルデータを格納するリスト
         self.tempHeater = 0.0   #ヒーター温度
         self.tempAir = 0.0      #大気温度
@@ -33,9 +35,16 @@ class ClsWellData:
         return __ret
     #データを追加する
     def Append(self,ch,sum,idx,air,heat,bias,exp_time):
+
+
         #初めてデータを追加する場合は現在時刻と代表値を記録
         if self.wellDataEmpty==True:
             self.recTime= datetime.datetime.now()   #記録時刻
+            #初回データフラグが立っている場合は、基準時刻を更新
+            if self.isFirstData==True:
+                self.startTime = self.recTime
+                self.isFirstData = False
+            self.elapsedTime = self.recTime - self.startTime#経過時間
             self.tempAir = air   #大気温度代表値
             self.tempHeater = heat #ヒーター温度代表値
             self.bias = bias #バイアス値代表値
@@ -48,12 +57,16 @@ class ClsWellData:
         self.Data18[ch] = sum / idx # 平均値を計算して格納
     #CSVの１行分に成形して返す
     def PrintOut(self):
+        # 経過時間を秒単位で計算
+        total_seconds = self.elapsedTime.total_seconds()
+        hours = int(total_seconds // 3600)
+        minutes = int((total_seconds % 3600) // 60)
+        seconds = int(total_seconds % 60)        
         #時間、大気温度、ヒーター温度、18chのデータをリストにして返す
-        ret=[self.recTime.strftime("%Y/%m/%d %H:%M:%S"),self.tempAir,self.tempHeater,*self.Data18,self.bias,self.exposure_time]
-        # ret=self.recTime.strftime("%Y/%m/%d %H:%M:%S")
-        # ret += "," + str(self.tempAir)
-        # ret += "," + str(self.tempHeater)
-        # ret += "," + ",".join(map(str, self.Data18))
+        ret=[self.recTime.strftime("%Y/%m/%d %H:%M:%S"),
+            f"{hours:02}:{minutes:02}:{seconds:02}",  # 経過時間をフォーマット
+            self.tempAir,self.tempHeater,*self.Data18,self.bias,self.exposure_time]
+
         return ret
 #=============================================================
 # データ記録するクラス
@@ -75,8 +88,9 @@ class Recorder:
     #現在時刻を元にファイル名を生成
     #---------------------------------------------
     def __createFileName(self,extention):
-        now = datetime.datetime.now()                   #現在時刻を取得
-        formatted_now = now.strftime("%Y(%m%d)%H%M-%S") #西暦＋日付＋時刻＋秒に変換
+        _now = datetime.datetime.now()                   #現在時刻を取得
+        self.wellData.isFirstData = True                   #開始時刻を記録するためにフラグを立てる
+        formatted_now = _now.strftime("%Y(%m%d)%H%M-%S") #西暦＋日付＋時刻＋秒に変換
         logging.debug(formatted_now)                    #
         #return formatted_now + extention                #拡張子を付けて返す
         return os.path.join(self.rootDir, formatted_now + extention)  # パスを結合して返す
@@ -87,7 +101,7 @@ class Recorder:
         with open(self.targetCsv, "w") as f:
             writer = csv.writer(f)
             #CSVタイトル行書込み
-            writer.writerow(["time","TempAir","TempHeater",
+            writer.writerow(["Time","ElapsedTime","TempAir","TempHeater",
                              "CH1","CH2","CH3","CH4","CH5","CH6","CH7","CH8","CH9","CH10","CH11","CH12","CH13","CH14","CH15","CH16","CH17","CH18","Bias","TIME"])
     #---------------------------------------------
     #CSV形式に成形:入力は　「CH:合計値:サンプル数:大気温度:ヒーター温度」の形式 ex CH0: 500:10:24.5:62.5
@@ -180,25 +194,28 @@ if __name__ == "__main__":
     #
     rec=Recorder("../LOG") #DATA_DIR="/home/hanabi/MH100data"
     rec.Start()
-    # ウェルバン番号:合計値：サンプル数：大気温度：ヒーター温度:バイアス値:照射時間
-    print(rec.Record( "Well_1:1000:100:23.4:26.89:100:1234"))
-    print(rec.Record( "Well_2:2000:100:23.4:26.89:101:1234"))
-    print(rec.Record( "Well_3:3000:100:23.4:26.89:102:1234"))
-    print(rec.Record( "Well_4:4000:100:23.4:26.89:103:1234"))
-    print(rec.Record( "Well_5:5000:100:23.4:26.89:104:1234"))
-    print(rec.Record( "Well_6:6000:100:23.4:26.89:105:1234"))
-    print(rec.Record( "Well_7:7000:100:23.4:26.89:106:1234"))
-    print(rec.Record( "Well_8:8000:100:23.4:26.89:107:1234"))
-    print(rec.Record( "Well_9:9000:100:23.4:26.89:108:1234"))
-    print(rec.Record("Well_10:10000:100:23.4:26.89:109:1234"))
-    print(rec.Record("Well_11:11000:100:23.4:26.89:110:1234"))
-    print(rec.Record("Well_12:12000:100:23.4:26.89:111:1234"))
-    print(rec.Record("Well_13:13000:100:23.4:26.89:112:1234"))
-    print(rec.Record("Well_14:14000:100:23.4:26.89:113:1234"))
-    print(rec.Record("Well_15:15000:100:23.4:26.89:114:1234"))
-    print(rec.Record("Well_16:16000:100:23.4:26.89:115:1234"))
-    print(rec.Record("Well_17:17000:100:23.4:26.89:116:1234"))
-    print(rec.Record("Well_18:18000:100:23.4:26.89:117:1234"))
+    time.sleep(2)
+    for i in range(10):
+        time.sleep(1)
+        # ウェル番号:合計値：サンプル数：大気温度：ヒーター温度:バイアス値:照射時間
+        print(rec.Record( "Well_1:1000:100:23.4:26.89:100:1234"))
+        print(rec.Record( "Well_2:2000:100:23.4:26.89:101:1234"))
+        print(rec.Record( "Well_3:3000:100:23.4:26.89:102:1234"))
+        print(rec.Record( "Well_4:4000:100:23.4:26.89:103:1234"))
+        print(rec.Record( "Well_5:5000:100:23.4:26.89:104:1234"))
+        print(rec.Record( "Well_6:6000:100:23.4:26.89:105:1234"))
+        print(rec.Record( "Well_7:7000:100:23.4:26.89:106:1234"))
+        print(rec.Record( "Well_8:8000:100:23.4:26.89:107:1234"))
+        print(rec.Record( "Well_9:9000:100:23.4:26.89:108:1234"))
+        print(rec.Record("Well_10:10000:100:23.4:26.89:109:1234"))
+        print(rec.Record("Well_11:11000:100:23.4:26.89:110:1234"))
+        print(rec.Record("Well_12:12000:100:23.4:26.89:111:1234"))
+        print(rec.Record("Well_13:13000:100:23.4:26.89:112:1234"))
+        print(rec.Record("Well_14:14000:100:23.4:26.89:113:1234"))
+        print(rec.Record("Well_15:15000:100:23.4:26.89:114:1234"))
+        print(rec.Record("Well_16:16000:100:23.4:26.89:115:1234"))
+        print(rec.Record("Well_17:17000:100:23.4:26.89:116:1234"))
+        print(rec.Record("Well_18:18000:100:23.4:26.89:117:1234"))
     rec.Stop()
 
 

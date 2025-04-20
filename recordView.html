@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSVデータのグラフ描画</title>
+    <script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script>
+</head>
+<body>
+    <h1>CSVデータのグラフ描画</h1>
+
+    <!-- グラフ描画エリア -->
+    <div id="graph" style="width: 100%; height: 600px;"></div>
+
+    <script>
+        // Python CGIスクリプトのURL
+        const cgiUrl = "/cgi-bin/get_csv_data.py";
+        // クエリパラメータから csv_name を取得
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // クエリパラメータから csv_name を取得
+        const csvPath = getQueryParam("csv_name");
+        if (csvPath) {
+            // ファイル名を取得し、拡張子を除去
+            const fileNameWithoutExtension = csvPath.split('/').pop().replace(/\.[^/.]+$/, '');
+        
+            // ファイル名を加工して「4月8日16:05-50」の形式に変換
+            const formattedTitle = formatCsvTitle(fileNameWithoutExtension);
+        
+            // タイトルを設定
+            document.title = formattedTitle;
+            document.querySelector("h1").textContent = `${formattedTitle}記録開始データ`;
+        
+            // グラフを描画
+            loadGraph(csvPath);
+        }
+
+        // ファイル名を「4月8日16:05-50」の形式に変換する関数
+        function formatCsvTitle(fileName) {
+            // 正規表現で日付と時刻を抽出
+            const match = fileName.match(/^2025\((\d{4})\)(\d{4})-(\d+)$/);
+            if (match) {
+                const month = parseInt(match[1].substring(0, 2), 10); // 月
+                const day = parseInt(match[1].substring(2, 4), 10);   // 日
+                const hour = parseInt(match[2].substring(0, 2), 10);  // 時
+                const minute = parseInt(match[2].substring(2, 4), 10); // 分
+                const suffix = match[3]; // サフィックス部分
+                return `${month}月${day}日${hour}:${minute}-${suffix}`;
+            }
+            // マッチしない場合はそのまま返す
+            return fileName;
+        }
+        // 指定されたCSVファイルをグラフに描画
+        async function loadGraph(csvPath) {
+            try {
+                // CGIスクリプトにCSVファイルのパスを渡す
+                const response = await fetch(`${cgiUrl}?csv_name=${encodeURIComponent(csvPath)}`);
+            
+                // レスポンスがJSON形式でない場合のエラーチェック
+                if (!response.ok) {
+                    throw new Error(`HTTPエラー: ${response.status}`);
+                }
+            
+                const result = await response.json();
+            
+                if (!result.success) {
+                    throw new Error(result.error || "データ取得に失敗しました。");
+                }
+            
+                // データを解析
+                const data = result.data;
+                const xAxis = result.x_axis; // 横軸（インデックス）
+                const traces = [];
+            
+                for (let ch = 0; ch < data[0].length; ch++) {
+                    const yAxis = data.map(row => row[ch]); // 縦軸（CHごとのデータ）
+                    traces.push({
+                        x: xAxis,
+                        y: yAxis,
+                        mode: "lines+markers",
+                        name: `CH${ch + 1}`
+                    });
+                }
+            
+                // グラフを描画
+                Plotly.newPlot("graph", traces, {
+                    title: `${csvPath}`,
+                    xaxis: { title: "Index" },
+                    yaxis: { title: "Value" },
+                    template: "plotly_dark"
+                });
+            
+            } catch (error) {
+                console.error("エラー:", error);
+                alert("データの取得に失敗しました。");
+            }
+        }
+    </script>
+</body>
+</html>
