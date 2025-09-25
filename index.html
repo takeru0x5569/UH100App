@@ -71,6 +71,18 @@
                 //----------------------------------------------
                 socket.onmessage = function(event) {
                     const data = JSON.parse(event.data);
+                    
+                    // コマンド結果の通知を処理
+                    if (data.type === 'command_result') {
+                        console.log(`他のクライアントからのコマンド: ${data.command}`);
+                        if (data.command === 'START') {
+                            // 他のクライアントがSTARTを押した場合、グラフをクリア
+                            clearAndResetGraph();
+                        }
+                        // STOPコマンドの場合は特に処理なし（データ送信が止まるだけ）
+                        return;
+                    }
+                    
                     if (data.backup_data) {
                         //バックアップデータのプロット
                         // バックアップデータをチャネルごとにグループ化
@@ -122,23 +134,39 @@
                     console.error("WebSocket error:", error);
                 };
     
+                // グラフをクリアしてリセットする関数
+                function clearAndResetGraph() {
+                    console.log("グラフをクリアしてリセット");
+                    // グラフをクリア
+                    Plotly.purge('graph');
+                    // traceDataをクリア
+                    traceData = [];
+                    for (var i = 0; i < CH_COUNT; i++) {
+                        traceData.push({
+                            x: [],
+                            y: [],
+                            mode: 'lines+markers',
+                            name: `Well${i+1}`  // インデックス修正
+                        });
+                    }                        
+                    // 新しいグラフを作成
+                    Plotly.newPlot('graph', traceData, layout);
+                    
+                    // グラフを全体表示に設定（auto-fit to data）
+                    Plotly.relayout('graph', {
+                        'xaxis.autorange': true,
+                        'yaxis.autorange': true
+                    });
+                    
+                    // 最新データ表示もクリア
+                    document.getElementById('latest-ch').textContent = 'Well: -';
+                    document.getElementById('latest-y').textContent = 'Value: -';
+                }
+
                 // ボタンが押されたときにサーバーにメッセージを送信
                 window.sendCommand = function(command) {
                     if (command === 'START') {
-                        // グラフをクリア
-                        Plotly.purge('graph');
-                        // traceDataをクリア
-                        traceData = [];
-                        for (var i = 0; i < CH_COUNT; i++) {
-                            traceData.push({
-                                x: [],
-                                y: [],
-                                mode: 'lines+markers',
-                                name: `Well${i}`
-                            });
-                        }                        
-                        // 新しいグラフを作成
-                        Plotly.newPlot('graph', traceData, layout);
+                        clearAndResetGraph();
                     }
                     socket.send(JSON.stringify({ command: command }));
                 };
